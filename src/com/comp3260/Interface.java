@@ -1,6 +1,4 @@
-package com.sutter;
-
-import com.sutter.AES.ECB;
+package com.comp3260;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

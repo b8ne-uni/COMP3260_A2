@@ -1,4 +1,4 @@
-package com.sutter;
+package com.comp3260;
 
 public class AESInterface {
     public static void main(String[] args) {

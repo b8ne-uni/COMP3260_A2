@@ -1,4 +1,4 @@
-package com.sutter.AES;
+package com.comp3260.AES;
 
 /**
  * Created by b8ne on 13/05/17.
