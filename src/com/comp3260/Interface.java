@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 
 import static java.lang.System.exit;
 
+/**
+ * Main Program Interface
+ */
 public class Interface {
     private int functionType;
     private int operationMode;
@@ -19,6 +22,10 @@ public class Interface {
     private Scanner console;
     private com.sutter.AES.AES AES;
 
+    /**
+     * Main Runnable method called on program entry
+     * @param input
+     */
     public void run(String[] input) {
         // Setup scanner
         console = new Scanner(System.in);

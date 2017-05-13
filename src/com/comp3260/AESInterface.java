@@ -1,5 +1,8 @@
 package com.comp3260;
 
+/**
+ * Main Program Entry
+ */
 public class AESInterface {
     public static void main(String[] args) {
         // Check input for file name
