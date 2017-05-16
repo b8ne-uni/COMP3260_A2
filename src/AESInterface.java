@@ -1,5 +1,3 @@
-package com.comp3260;
-
 /**
  * Main Program Entry
  */

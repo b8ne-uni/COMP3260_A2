@@ -1,12 +1,10 @@
-package com.comp3260.AES;
-
 /**
  * Main AES Class
  * Contains all common AES encrypt/decrypt data and methods
  */
 public abstract class AES {
     // Holds the expanded Key
-    protected String[][] expandedKey;
+    protected int[][] expandedKey;
 
     // S-Box lookup table for encryption
     protected static int[][] sbox = {
@@ -52,7 +50,7 @@ public abstract class AES {
      * Expands given key to create individual round keys
      * @param key
      */
-    protected void keyExpansion(String[] key) {
+    protected void keyExpansion(int[][] key) {
         // Expand key here
 
         this.expandedKey = key;
@@ -63,7 +61,7 @@ public abstract class AES {
      * @param state
      * @param key
      */
-    protected void addRoundKey(String[][] state, String key) {
+    protected int[][] addRoundKey(int[][] state, String key) {
         // Loop the 2D array
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -94,9 +92,9 @@ public abstract class AES {
      * @param state
      * @return
      */
-    protected String[][] shiftRows(String[][] state) {
+    protected int[][] shiftRows(int[][] state) {
         // Init temp matrix
-        String[4][4] tmp;
+        int[][] tmp = new int[4][4];
 
         // Row 0 is untouched
         tmp[0][0] = state[0][0];
@@ -129,9 +127,9 @@ public abstract class AES {
      * Shift rows to the right based on its level
      * @param state
      */
-    protected void invShiftRows(String[][] state) {
+    protected int[][] invShiftRows(int[][] state) {
         // Init temp matrix
-        String[4][4] tmp;
+        int[][] tmp = new int[4][4];
 
         // Row 0 is untouched
         tmp[0][0] = state[0][0];
@@ -164,10 +162,10 @@ public abstract class AES {
      * Substitute key bytes with bytes from the S-Box
      * @param state
      */
-    protected void subBytes(String[][] state) {
+    protected int[][] subBytes(int[][] state) {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                String hexValue = state[i][j];
+                int hexValue = state[i][j];
                 state[i][j] = sbox[hexValue / 16][hexValue % 16];
             }
         }
@@ -179,10 +177,10 @@ public abstract class AES {
      * Substitute key bytes with bytes from the invers S-Box
      * @param state
      */
-    protected void invSubBytes(String[][] state) {
+    protected int[][] invSubBytes(int[][] state) {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                String hexValue = state[i][j];
+                int hexValue = state[i][j];
                 state[i][j] = rsbox[hexValue / 16][hexValue % 16];
             }
         }
@@ -194,11 +192,11 @@ public abstract class AES {
      * Abstract class for encryption
      * To be implemented on an Encryption mode basis
      */
-    public abstract void encrypt();
+    public abstract String encrypt();
 
     /**
      * Abstract class for decryption
      * To be implemented on a Decryption mode basis
      */
-    public abstract void decrypt();
+    public abstract String decrypt();
 }
