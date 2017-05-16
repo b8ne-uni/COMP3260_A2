@@ -1,3 +1,4 @@
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +21,7 @@ public class Interface {
     private String inputText, key, initilizationVector;
     private Scanner console;
     private AES aes;
+    private String filename;
 
     /**
      * Main Runnable method called on program entry
@@ -35,10 +37,11 @@ public class Interface {
         try {
             for (String file : input) {
                 // Get content from file
-                String content = readFile("./out/production/COMP3260_A2/" + file, StandardCharsets.UTF_8);
+                filename = file;
+                String content = readFile("./out/production/COMP3260_A2/" + filename, StandardCharsets.UTF_8);
 
                 // Setup regex
-                String regex = "[\\r\\n]*(?<TYPE>[\\d])[\\r\\n]+(?<MODE>[\\d])[\\r\\n]+(?<TSIZE>[\\d]+)[\\r\\n]+(?<INPUT>[[:ascii:]]{64,95})[\\r\\n]+(?<KEY>[[:ascii:]]{32,47})[\\r\\n]+(?<IV>[\\d]*[[:ascii:]]*)";
+                String regex = "[\\r\\n]*(?<TYPE>[\\d])[\\r\\n]+(?<MODE>[\\d])[\\r\\n]+(?<TSIZE>[\\d]+)[\\r\\n]+(?<INPUT>[0-9A-F\\s]{64,95})[\\r\\n]+(?<KEY>[0-9A-F\\s]{32,47})[\\r\\n]+(?<IV>[\\d]*[0-9A-F\\s]*)";
 
                 // Setup Pattern and Matcher
                 Pattern p = Pattern.compile(regex);
@@ -48,8 +51,8 @@ public class Interface {
                 while(m.find()) {
                     this.functionType = Integer.parseInt(m.group("TYPE"));
                     this.operationMode = Integer.parseInt(m.group("MODE"));
-                    this.inputText = m.group("INPUT");
                     this.transmissionSize = Integer.parseInt(m.group("TSIZE"));
+                    this.inputText = m.group("INPUT");
                     this.key = m.group("KEY");
                     this.initilizationVector = m.group("IV");
                 }
@@ -117,7 +120,25 @@ public class Interface {
         }
 
         // Prompt for output type
-        System.out.println("Please enter an output file to export results to, or 99 to display on screen:");
+        System.out.println("Would you like to output result to a file? [Y/n]");
+        String out = console.next();
+        if (!out.equals("n")) {
+            // Output to input file + _out
+            try {
+                // Open new file
+                BufferedWriter output_file = Files.newBufferedWriter(Paths.get("./out/production/COMP3260_A2/output_" + filename));
+                // Write results
+                output_file.write(result);
+                // Close file
+                output_file.close();
+                System.out.println("Results have been stored in output_" + filename);
+            } catch (IOException ex) {
+                System.out.println("Unable to generate output file.");
+            }
+        } else {
+            // Output to cli and end
+            System.out.println(result);
+        }
     }
 
     /**
