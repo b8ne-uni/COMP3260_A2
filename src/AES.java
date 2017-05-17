@@ -7,7 +7,7 @@ public abstract class AES {
     protected int[][] expandedKey;
 
     // S-Box lookup table for encryption
-    protected static int[][] sbox = {
+    private static int[][] sbox = {
             { 0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76 },
             { 0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0 },
             { 0xB7, 0xFD, 0x93, 0x26, 0x36, 0x3F, 0xF7, 0xCC, 0x34, 0xA5, 0xE5, 0xF1, 0x71, 0xD8, 0x31, 0x15 },
@@ -27,7 +27,7 @@ public abstract class AES {
     };
 
     // Inverse S-Box lookup table for decryption
-    protected static int[][] rsbox = {
+    private static int[][] rsbox = {
             { 0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb },
             { 0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb },
             { 0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d, 0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e },
@@ -46,27 +46,144 @@ public abstract class AES {
             { 0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6,0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d }
     };
 
+    private static int[][] galois = {
+            {0x02, 0x03, 0x01, 0x01},
+            {0x01, 0x02, 0x03, 0x01},
+            {0x01, 0x01, 0x02, 0x03},
+            {0x03, 0x01, 0x01, 0x02}
+    };
+
+    private static int[][] invgalois = {
+            {0x0e, 0x0b, 0x0d, 0x09},
+            {0x09, 0x0e, 0x0b, 0x0d},
+            {0x0d, 0x09, 0x0e, 0x0b},
+            {0x0b, 0x0d, 0x09, 0x0e}
+    };
+
+    private static final int[] rcon = {
+            0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
+            0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
+            0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a,
+            0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8,
+            0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef,
+            0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc,
+            0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b,
+            0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3,
+            0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94,
+            0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20,
+            0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35,
+            0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f,
+            0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04,
+            0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63,
+            0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd,
+            0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb
+    };
+
+    private int galoisMultiplication(int a, int b) {
+        int x = 0;
+        int counter, y;
+
+        for (counter = 0; counter < 8; counter++) {
+            if ((b & 1) == 1) {
+                x ^= a;
+            }
+            y = (a & 0x80);
+            a <<= 1;
+            if (y == 0x80) {
+                a ^= 0x1b;
+            }
+            b >>= 1;
+        }
+        return x;
+    }
+
     /**
      * Expands given key to create individual round keys
      * @param key
      */
-    protected void keyExpansion(int[][] key) {
-        // Expand key here
+    protected int[][] keyExpansion(String key) {
+        // Set number of keys we need - 10 keys x 4 bytes + initial
+        int keySize = 44;
+        // Init rcon pointer
+        int rconIndex = 1;
+        // Init key variable
+        int[][] expandedKey = new int[4][keySize];
+        // First parse key into 4x4 matrix
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                expandedKey[i][j] = Integer.parseInt(key.substring((8 * i) + (2 * j), (8 * i) + (2 * j + 2)), 16);
+            }
+        }
 
-        this.expandedKey = key;
+        // Set start point - given we have already filled the first key
+        int current = 4;
+        // Set some temp variables
+        int[] a = new int[4];
+        int b;
+        while (current < keySize) {
+            if (current % 4 == 0) {
+                // We need to go through the g function
+                // First copy last word
+                for (b = 0; b < 4; b++) {
+                    a[b] = expandedKey[b][current - 1];
+                }
+                // Go through g
+                a = gFunction(a, rconIndex++);
+                // XOR with [i-4] word
+                for (b = 0; b < 4; b++) {
+                    expandedKey[b][current] = a[b] ^ expandedKey[b][current - 4];
+                }
+            } else {
+                // Simply XOR with [i-4]
+                for (b = 0; b < 4; b++) {
+                    expandedKey[b][current] = expandedKey[b][current - 1] ^ expandedKey[b][current - 4];
+                }
+            }
+            current++;
+        }
+
+        return expandedKey;
+    }
+
+    private int[] gFunction(int[] a, int index) {
+        int[] tmp = new int[4];
+
+        // Rotate
+        tmp[0] = a[1];
+        tmp[1] = a[2];
+        tmp[2] = a[3];
+        tmp[3] = a[0];
+
+        // Sub with sBox
+        int val;
+        for (int i = 0; i < 4; i++) {
+            val = tmp[i];
+            tmp[i] = sbox[val / 16][val % 16];
+        }
+
+        // Finally XOR with rcon
+        tmp[0] ^= rcon[index];
+
+        return tmp;
     }
 
     /**
      * Adds round key to state via XOR
      * @param state
-     * @param key
      */
-    protected int[][] addRoundKey(int[][] state, String key) {
-        // Loop the 2D array
+    protected int[][] addRoundKey(int[][] state, int round) {
+        // First need to get the round key from key matrix
+        int[][] roundKey = new int[4][4];
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                // XOR current byte with equivalent key byte
-                state[i][j] ^= this.expandedKey[i][j];
+                roundKey[i][j] = this.expandedKey[i][(round + j) * 4];
+            }
+        }
+
+        // Now XOR roundKey with state
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                state[i][j] ^= roundKey[i][j];
             }
         }
 
@@ -76,15 +193,51 @@ public abstract class AES {
     /**
      * Mix columns via multiplication
      */
-    protected void mixColumns() {
+    protected int[][] mixColumns(int[][] state) {
+        int[][] tmp = new int[4][4];
+        // Loop the 2D array
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                // Setup temp calc value for sumations
+                int val = 0;
+                for (int k = 0; k < 4; k++) {
+                    // Get galois value
+                    int g = galois[i][k];
+                    // Get state value
+                    int s = state[k][j];
+                    // Perform multiplication
+                    val ^= galoisMultiplication(g, s);
+                }
+                tmp[i][j] = val;
+            }
+        }
 
+        return tmp;
     }
 
     /**
      * Invers mix columns
      */
-    protected void invMixColumns() {
+    protected int[][] invMixColumns(int[][] state) {
+        int[][] tmp = new int[4][4];
+        // Loop the 2D array
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                // Setup temp calc value for sumations
+                int val = 0;
+                for (int k = 0; k < 4; k++) {
+                    // Get galois value
+                    int g = invgalois[i][k];
+                    // Get state value
+                    int s = state[k][j];
+                    // Perform multiplication
+                    val ^= galoisMultiplication(g, s);
+                }
+                tmp[i][j] = val;
+            }
+        }
 
+        return tmp;
     }
 
     /**
@@ -188,15 +341,32 @@ public abstract class AES {
         return state;
     }
 
+    protected String toString(int[][] state) {
+        String output = "";
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                String k = Integer.toHexString(state[j][i]).toUpperCase();
+                if (k.length() == 1) {
+                    output += '0' + k;
+                } else {
+                    output += k;
+                }
+            }
+        }
+
+        return output;
+    }
+
     /**
      * Abstract class for encryption
      * To be implemented on an Encryption mode basis
      */
-    public abstract String encrypt();
+    public abstract String encrypt(String input);
 
     /**
      * Abstract class for decryption
      * To be implemented on a Decryption mode basis
      */
-    public abstract String decrypt();
+    public abstract String decrypt(String input);
 }

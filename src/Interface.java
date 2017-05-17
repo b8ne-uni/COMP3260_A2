@@ -52,8 +52,8 @@ public class Interface {
                     this.functionType = Integer.parseInt(m.group("TYPE"));
                     this.operationMode = Integer.parseInt(m.group("MODE"));
                     this.transmissionSize = Integer.parseInt(m.group("TSIZE"));
-                    this.inputText = m.group("INPUT");
-                    this.key = m.group("KEY");
+                    this.inputText = this.clean(m.group("INPUT"));
+                    this.key = this.clean(m.group("KEY"));
                     this.initilizationVector = m.group("IV");
                 }
 
@@ -111,12 +111,15 @@ public class Interface {
                 break;
         }
 
+        // Expand Key
+        this.aes.keyExpansion(this.key);
+
         // Now run encrypt/decrypt
         String result;
         if (this.functionType == 0) {
-            result = this.aes.encrypt();
+            result = this.aes.encrypt(this.inputText);
         } else {
-            result = this.aes.decrypt();
+            result = this.aes.decrypt(this.inputText);
         }
 
         // Prompt for output type
@@ -153,5 +156,14 @@ public class Interface {
     {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
+    }
+
+    /**
+     * Helper function to remove all whitespace from input
+     * @param input
+     * @return
+     */
+    private String clean(String input) {
+        return input.replaceAll("[\\s\\r\\n]*", "");
     }
 }
