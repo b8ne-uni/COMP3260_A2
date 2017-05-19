@@ -38,7 +38,7 @@ public class Interface {
             for (String file : input) {
                 // Get content from file
                 filename = file;
-                String content = readFile("./out/production/COMP3260_A2/" + filename, StandardCharsets.UTF_8);
+                String content = readFile("./out/production/COMP3260-A2/" + filename, StandardCharsets.UTF_8);
 
                 // Setup regex
                 String regex = "[\\r\\n]*(?<TYPE>[\\d])[\\r\\n]+(?<MODE>[\\d])[\\r\\n]+(?<TSIZE>[\\d]+)[\\r\\n]+(?<INPUT>[0-9A-F\\s]{64,95})[\\r\\n]+(?<KEY>[0-9A-F\\s]{32,47})[\\r\\n]+(?<IV>[\\d]*[0-9A-F\\s]*)";
@@ -112,7 +112,7 @@ public class Interface {
         }
 
         // Expand Key
-        this.aes.keyExpansion(this.key);
+        this.aes.expandedKey = this.aes.keyExpansion(this.key);
 
         // Now run encrypt/decrypt
         String result;
@@ -129,8 +129,13 @@ public class Interface {
             // Output to input file + _out
             try {
                 // Open new file
-                BufferedWriter output_file = Files.newBufferedWriter(Paths.get("./out/production/COMP3260_A2/output_" + filename));
+                BufferedWriter output_file = Files.newBufferedWriter(Paths.get("./out/production/COMP3260-A2/output_" + filename));
                 // Write results
+                if (this.functionType == 0) {
+                    output_file.write("Ciphertext:\n");
+                } else {
+                    output_file.write("Plaintext:\n");
+                }
                 output_file.write(result);
                 // Close file
                 output_file.close();
@@ -140,7 +145,12 @@ public class Interface {
             }
         } else {
             // Output to cli and end
-            System.out.println(result);
+            if (this.functionType == 0) {
+                System.out.println("\nCiphertext:");
+            } else {
+                System.out.println("\nPlaintext:");
+            }
+            System.out.println(result + "\n");
         }
     }
 

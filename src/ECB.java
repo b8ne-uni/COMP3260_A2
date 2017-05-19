@@ -1,19 +1,23 @@
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ECB extends AES {
 
     @Override
     public String encrypt(String input) {
         // Input may be greater than 16 bytes, so split
-        String[] values = input.split("[A-F0-9]{32}");
+        Matcher m = Pattern.compile(".{1,32}").matcher(input);
 
         // Run for each 16 bytes
         int[][] state = new int[4][4];
-        int recursions = 0;
         String output = "";
-        while (recursions < values.length) {
+        while (m.find()) {
+            String chunk = input.substring(m.start(), m.end());
+
             // Parse string into 4 x 4 state
             for (int j = 0; j < 4; j++) {
                 for (int k = 0; k < 4; k++) {
-                    state[j][k] = Integer.parseInt(values[recursions].substring((8 * j) + (2 * k), (8 * j) + (2 * k + 2)), 16);
+                    state[j][k] = Integer.parseInt(chunk.substring((8 * j) + (2 * k), (8 * j) + (2 * k + 2)), 16);
                 }
             }
 
@@ -34,11 +38,9 @@ public class ECB extends AES {
             state = this.addRoundKey(state, 10);
 
             output = output.concat(this.toString(state));
-
-            recursions++;
         }
 
-        return "";
+        return output;
     }
 
     @Override
