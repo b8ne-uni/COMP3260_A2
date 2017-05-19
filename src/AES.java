@@ -3,6 +3,9 @@
  * Contains all common AES encrypt/decrypt data and methods
  */
 public abstract class AES {
+    // Holds the initialization vector.
+    protected int[][] initializationVector = new int[4][4];
+
     // Holds the expanded Key
     protected int[][] expandedKey;
 
@@ -98,6 +101,23 @@ public abstract class AES {
     }
 
     /**
+     * Pulls out the subkey from the key formed from the keyExpansion method
+     * @param expandedKey key formed from AES.keyExpansion()
+     * @param begin index of where to fetch the subkey
+     * @return The chunk of the expanded key based on begin.
+     */
+
+    protected int[][] subKey(int[][] expandedKey, int begin) {
+        int[][] arr = new int[4][4];
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr.length; j++) {
+                arr[i][j] = expandedKey[i][4 * begin + j];
+            }
+        }
+        return arr;
+    }
+
+    /**
      * Expands given key to create individual round keys
      * @param key
      */
@@ -141,7 +161,6 @@ public abstract class AES {
             }
             current++;
         }
-
         return expandedKey;
     }
 
@@ -290,19 +309,19 @@ public abstract class AES {
         tmp[0][2] = state[0][2];
         tmp[0][3] = state[0][3];
 
-        // Shift row 1 left 1 position
+        // Shift row 1 right 1 position
         tmp[1][0] = state[1][3];
         tmp[1][1] = state[1][0];
         tmp[1][2] = state[1][1];
         tmp[1][3] = state[1][2];
 
-        // Shift row 2 left 2 positions
+        // Shift row 2 right 2 positions
         tmp[2][0] = state[2][2];
         tmp[2][1] = state[2][3];
         tmp[2][2] = state[2][0];
         tmp[2][3] = state[2][1];
 
-        // Shift row 3 left 3 positions
+        // Shift row 3 right 3 positions
         tmp[3][0] = state[3][1];
         tmp[3][1] = state[3][2];
         tmp[3][2] = state[3][3];
@@ -344,9 +363,17 @@ public abstract class AES {
     protected String toString(int[][] state) {
         String output = "";
 
+        System.out.println(state[0][0]);
+        System.out.println(state[0][1]);
+        System.out.println(state[0][2]);
+        System.out.println(state[0][3]);
+
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 String k = Integer.toHexString(state[j][i]).toUpperCase();
+
+                System.out.println(k);
+
                 if (k.length() == 1) {
                     output += '0' + k;
                 } else {

@@ -7,6 +7,7 @@ public class ECB extends AES {
 
         // Run for each 16 bytes
         int[][] state = new int[4][4];
+
         int recursions = 0;
         String output = "";
         while (recursions < values.length) {
