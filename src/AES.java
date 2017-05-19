@@ -5,6 +5,9 @@
 public abstract class AES {
     // Holds the expanded Key
     protected int[][] expandedKey;
+    // Holds the initialization vector.
+    protected int[][] initializationVector = new int[4][4];
+
 
     private int galoisMultiplication(int a, int b) {
         int p = 0;
@@ -223,19 +226,19 @@ public abstract class AES {
         tmp[0][2] = state[0][2];
         tmp[0][3] = state[0][3];
 
-        // Shift row 1 left 1 position
+        // Shift row 1 right 1 position
         tmp[1][0] = state[1][3];
         tmp[1][1] = state[1][0];
         tmp[1][2] = state[1][1];
         tmp[1][3] = state[1][2];
 
-        // Shift row 2 left 2 positions
+        // Shift row 2 right 2 positions
         tmp[2][0] = state[2][2];
         tmp[2][1] = state[2][3];
         tmp[2][2] = state[2][0];
         tmp[2][3] = state[2][1];
 
-        // Shift row 3 left 3 positions
+        // Shift row 3 right 3 positions
         tmp[3][0] = state[3][1];
         tmp[3][1] = state[3][2];
         tmp[3][2] = state[3][3];

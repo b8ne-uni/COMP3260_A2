@@ -54,7 +54,7 @@ public class Interface {
                     this.transmissionSize = Integer.parseInt(m.group("TSIZE"));
                     this.inputText = this.clean(m.group("INPUT"));
                     this.key = this.clean(m.group("KEY"));
-                    this.initilizationVector = m.group("IV");
+                    this.initilizationVector = this.clean(m.group("IV"));
                 }
 
                 // Perform some quick validation
@@ -82,6 +82,14 @@ public class Interface {
                 // Check transmission size if applicable
 
                 // Check IV if applicable
+                while (this.operationMode == 1 && this.initilizationVector.equals("0")) {
+                    System.out.println("IV is required for CFB mode. Please enter one, or 99 to exit.");
+                    this.initilizationVector = console.nextLine();
+
+                    // Exit on 99.
+                    if (this.initilizationVector.equals("99"))
+                        exit(0);
+                }
 
             }
         } catch (IOException ex) {
@@ -98,6 +106,12 @@ public class Interface {
             case 1:
                 // CFB
                 this.aes = new CFB();
+                // Parse IV
+                for (int i = 0; i < 4; i++) {
+                    for (int j = 0; j < 4; j++) {
+                        this.aes.initializationVector[j][i] = Integer.parseInt(this.initilizationVector.substring((8 * i) + (2 * j), (8 * i) + (2 * j + 2)), 16);
+                    }
+                }
                 break;
             case 2:
                 // CBC
