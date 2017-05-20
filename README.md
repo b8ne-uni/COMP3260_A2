@@ -6,7 +6,7 @@ Unpackage or clone into a directory
 
 cd into directory and
 ```java
-javac AESInterface
+javac *.java
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ This can be displayed to cli or output to file, in which case will be stored in 
 ## Notes
 It is assumed that all input data is accurate.
 
-####Input format is as follows:
+###Input format is as follows:
 
 Line 1 - 0 or 1 for encryption or decryption respectively
 
