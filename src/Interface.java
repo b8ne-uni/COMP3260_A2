@@ -37,7 +37,8 @@ public class Interface {
             for (String file : input) {
                 // Get content from file
                 filename = file;
-                String content = readFile("./out/production/COMP3260_A2/" + filename, StandardCharsets.UTF_8);
+                //String content = readFile("./out/production/COMP3260_A2" + filename, StandardCharsets.UTF_8);
+                String content = readFile("./" + filename, StandardCharsets.UTF_8);
 
                 // Setup regex
                 String regex = "[\\r\\n]*(?<TYPE>[\\d])[\\r\\n]+(?<MODE>[\\d])[\\r\\n]+(?<TSIZE>[\\d]+)[\\r\\n]+(?<INPUT>[0-9A-Fa-f\\s]{64,95})[\\r\\n]+(?<KEY>[0-9A-Fa-f\\s]{32,47})[\\r\\n]+(?<IV>[0-9A-Fa-f\\s]{32,47})";
@@ -143,7 +144,8 @@ public class Interface {
             // Output to input output_ + file
             try {
                 // Open new file
-                BufferedWriter output_file = Files.newBufferedWriter(Paths.get("./out/production/COMP3260_A2/output_" + filename));
+                //BufferedWriter output_file = Files.newBufferedWriter(Paths.get("./out/production/COMP3260_A2/output_" + filename));
+                BufferedWriter output_file = Files.newBufferedWriter(Paths.get("./" + filename));
                 // Write results
                 if (this.functionType == 0) {
                     output_file.write("Ciphertext:\n");
