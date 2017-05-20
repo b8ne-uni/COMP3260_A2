@@ -25,7 +25,6 @@ public class Interface {
 
     /**
      * Main Runnable method called on program entry
-     * @param input
      */
     public void run(String[] input) {
         // Setup scanner
@@ -38,7 +37,7 @@ public class Interface {
             for (String file : input) {
                 // Get content from file
                 filename = file;
-                String content = readFile("./out/production/COMP3260-A2/" + filename, StandardCharsets.UTF_8);
+                String content = readFile("./out/production/COMP3260_A2/" + filename, StandardCharsets.UTF_8);
 
                 // Setup regex
                 String regex = "[\\r\\n]*(?<TYPE>[\\d])[\\r\\n]+(?<MODE>[\\d])[\\r\\n]+(?<TSIZE>[\\d]+)[\\r\\n]+(?<INPUT>[0-9A-F\\s]{64,95})[\\r\\n]+(?<KEY>[0-9A-F\\s]{32,47})[\\r\\n]+(?<IV>[\\d]*[0-9A-F\\s]*)";
@@ -78,7 +77,6 @@ public class Interface {
                     if (this.operationMode == 99)
                         exit(0);
                 }
-
                 // Check transmission size if applicable
 
                 // Check IV if applicable
@@ -107,6 +105,7 @@ public class Interface {
                 // CFB
                 this.aes = new CFB();
                 // Parse IV
+                // TODO: Move this to CFB encrypt and decrypt methods
                 for (int i = 0; i < 4; i++) {
                     for (int j = 0; j < 4; j++) {
                         this.aes.initializationVector[j][i] = Integer.parseInt(this.initilizationVector.substring((8 * i) + (2 * j), (8 * i) + (2 * j + 2)), 16);
@@ -131,19 +130,23 @@ public class Interface {
         // Now run encrypt/decrypt
         String result;
         if (this.functionType == 0) {
+            System.out.println("Encrypting input...");
             result = this.aes.encrypt(this.inputText);
+            System.out.println("Finished encrypting!");
         } else {
+            System.out.println("Decrypting input...");
             result = this.aes.decrypt(this.inputText);
+            System.out.println("Finished decrypting!");
         }
 
         // Prompt for output type
         System.out.println("Would you like to output result to a file? [Y/n]");
         String out = console.next();
         if (!out.equals("n")) {
-            // Output to input file + _out
+            // Output to input output_ + file
             try {
                 // Open new file
-                BufferedWriter output_file = Files.newBufferedWriter(Paths.get("./out/production/COMP3260-A2/output_" + filename));
+                BufferedWriter output_file = Files.newBufferedWriter(Paths.get("./out/production/COMP3260_A2/output_" + filename));
                 // Write results
                 if (this.functionType == 0) {
                     output_file.write("Ciphertext:\n");
@@ -170,10 +173,6 @@ public class Interface {
 
     /**
      * Private helper function to read in file
-     * @param path
-     * @param encoding
-     * @return
-     * @throws IOException
      */
     private static String readFile(String path, Charset encoding)
             throws IOException
@@ -184,8 +183,6 @@ public class Interface {
 
     /**
      * Helper function to remove all whitespace from input
-     * @param input
-     * @return
      */
     private String clean(String input) {
         return input.replaceAll("[\\s\\r\\n]*", "");
