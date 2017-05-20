@@ -300,6 +300,31 @@ public abstract class AES {
     }
 
     /**
+     * Helper function to perform deep copies on 2D array
+     */
+    protected int[][] deepCopyState(int[][] state) {
+        int[][] tmp = new int[4][4];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                tmp[i][j] = state[i][j];
+            }
+        }
+
+        return tmp;
+    }
+
+    /**
+     * Parse IV into a useful block array
+     */
+    public void parseIV(String iv) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                this.initializationVector[j][i] = Integer.parseInt(iv.substring((8 * i) + (2 * j), (8 * i) + (2 * j + 2)), 16);
+            }
+        }
+    }
+
+    /**
      * Converts integer array state to a string
      */
     protected String toString(int[][] state) {

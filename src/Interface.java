@@ -40,7 +40,7 @@ public class Interface {
                 String content = readFile("./out/production/COMP3260_A2/" + filename, StandardCharsets.UTF_8);
 
                 // Setup regex
-                String regex = "[\\r\\n]*(?<TYPE>[\\d])[\\r\\n]+(?<MODE>[\\d])[\\r\\n]+(?<TSIZE>[\\d]+)[\\r\\n]+(?<INPUT>[0-9A-F\\s]{64,95})[\\r\\n]+(?<KEY>[0-9A-F\\s]{32,47})[\\r\\n]+(?<IV>[\\d]*[0-9A-F\\s]*)";
+                String regex = "[\\r\\n]*(?<TYPE>[\\d])[\\r\\n]+(?<MODE>[\\d])[\\r\\n]+(?<TSIZE>[\\d]+)[\\r\\n]+(?<INPUT>[0-9A-Fa-f\\s]{64,95})[\\r\\n]+(?<KEY>[0-9A-Fa-f\\s]{32,47})[\\r\\n]+(?<IV>[0-9A-Fa-f\\s]{32,47})";
 
                 // Setup Pattern and Matcher
                 Pattern p = Pattern.compile(regex);
@@ -105,16 +105,13 @@ public class Interface {
                 // CFB
                 this.aes = new CFB();
                 // Parse IV
-                // TODO: Move this to CFB encrypt and decrypt methods
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 4; j++) {
-                        this.aes.initializationVector[j][i] = Integer.parseInt(this.initilizationVector.substring((8 * i) + (2 * j), (8 * i) + (2 * j + 2)), 16);
-                    }
-                }
+                this.aes.parseIV(this.initilizationVector);
                 break;
             case 2:
                 // CBC
                 this.aes = new CBC();
+                // Parse IV
+                this.aes.parseIV(this.initilizationVector);
                 break;
             case 3:
                 // OFB
